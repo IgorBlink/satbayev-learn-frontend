@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import './SkillsChoose.css';
 import { getUserSkills, updateUserSkills } from '../../api/api';
 import Loader from '../../helpers/Loader';
-
+import { useNotification } from './helpers/Notificathions'; 
 const SkillsChoose = () => {
     const [selectedSkills, setSelectedSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasExistingSkills, setHasExistingSkills] = useState(false);
     const navigate = useNavigate();
-
+    const { showNotification } = useNotification(); 
     const skills = [
         { id: 'html', name: 'HTML', icon: '🌐' },
         { id: 'css', name: 'CSS', icon: '🎨' },

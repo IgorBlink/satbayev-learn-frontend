@@ -122,7 +122,7 @@ function App() {
   // Check for skills redirect - simplified condition
   if (user?.user && !skills?.length) {
     console.log('Redirecting to skills choose');
-    return <SkillsChoose />;
+    return <SkillsChoose />;  
   }
 
   // If we get here, we should have both user and skills
