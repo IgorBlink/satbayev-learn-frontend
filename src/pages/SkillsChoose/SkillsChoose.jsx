@@ -67,10 +67,11 @@ const SkillsChoose = () => {
             }
 
             await updateUserSkills(telegramId, selectedSkills);
-            navigate('/chat', { replace: true });
+            navigate('/', { replace: true });
         } catch (error) {
             console.error('Error saving skills:', error);
-            // You might want to show an error message to the user
+            // Add error notification
+            showNotification?.("Error", "Failed to save skills", "error");
         } finally {
             setLoading(false);
         }
@@ -82,7 +83,7 @@ const SkillsChoose = () => {
 
     return (
         <div className="skills-container123">
-            <button className="back-button" onClick={() => navigate('/statistics')}>
+            <button className="back-button" onClick={() => navigate('/', { replace: true })}>
                 ← Back
             </button>
             <div className="skills-banner123">

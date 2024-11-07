@@ -21,6 +21,8 @@ import Hometask from './pages/Hometask/Hometask';
 import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
 import { Backgroun } from './helpers/Background';
 import { getUserSkills, updateUserSkills } from './api/api';
+import { BrowserRouter } from 'react-router-dom';
+
 export const UserContext = createContext({ 
   user: null 
 }) 
@@ -122,38 +124,40 @@ function App() {
   // Check for skills redirect - simplified condition
   if (user?.user && !skills?.length) {
     console.log('Redirecting to skills choose');
-    return <Navigate to="/skillschoose" replace />;
+    return <Navigate to="/skillschoose" replace={true} />;
   }
 
   // If we get here, we should have both user and skills
   console.log('Rendering main app');
 
-  return ( 
-    <UserContext.Provider value={{ 
-      user: user?.user || null,
-      courses: user?.courses || [],
-      setUser,
-      fetchUser
-    }}> 
-      <div className="app"> 
-        <Routes> 
-          <Route path='/' element={<Main />}/> 
-          <Route path='/statistics' element={<Statistics />}/> 
-          <Route path='/courses' element={<MyCourses />}/> 
-          <Route path='/courses/:id' element={<CoursesByCategory />}/> 
-          <Route path='/course/:id' element={<Course />}/> 
-          <Route path='/courses/:id/modules/:moduleId' element={<Module />}/> 
-          <Route path='/courses/:id/modules/:moduleId/test' element={<TestPage />}/> 
-          <Route path='/courses/:id/modules/:moduleId/homework' element={<Hometask />}/> 
-          <Route path='/top' element={<TopLider />}/>
-          <Route path='/history' element={<History />}/>
-          <Route path='/question/:id' element={<Question />}/>
-          <Route path='/result/:id' element={<ResultTest />}/>
-          <Route path='/skillschoose' element={<SkillsChoose/>}/>
-          <Route path='/*' element={<Navigate to="/" />}/>
-        </Routes> 
-      </div> 
-    </UserContext.Provider> 
+  return (
+    <BrowserRouter>
+      <UserContext.Provider value={{ 
+        user: user?.user || null,
+        courses: user?.courses || [],
+        setUser,
+        fetchUser
+      }}> 
+        <div className="app"> 
+          <Routes> 
+            <Route path='/' element={<Main />}/> 
+            <Route path='/statistics' element={<Statistics />}/> 
+            <Route path='/courses' element={<MyCourses />}/> 
+            <Route path='/courses/:id' element={<CoursesByCategory />}/> 
+            <Route path='/course/:id' element={<Course />}/> 
+            <Route path='/courses/:id/modules/:moduleId' element={<Module />}/> 
+            <Route path='/courses/:id/modules/:moduleId/test' element={<TestPage />}/> 
+            <Route path='/courses/:id/modules/:moduleId/homework' element={<Hometask />}/> 
+            <Route path='/top' element={<TopLider />}/>
+            <Route path='/history' element={<History />}/>
+            <Route path='/question/:id' element={<Question />}/>
+            <Route path='/result/:id' element={<ResultTest />}/>
+            <Route path='/skillschoose' element={<SkillsChoose/>}/>
+            <Route path='/*' element={<Navigate to="/" />}/>
+          </Routes> 
+        </div> 
+      </UserContext.Provider>
+    </BrowserRouter>
   ); 
 } 
 
