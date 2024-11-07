@@ -109,11 +109,12 @@ function App() {
     return <OverviewBlocks />;
   }
 
-  // Redirect to skills choose ONLY if user exists, is not new, and has no skills
+  // Redirect to skills choose if:
+  // 1. User exists and is not new
+  // 2. Skills is null OR skills is an empty array
   if (user?.user && 
       !user.user.newUser && 
-      Array.isArray(skills) && 
-      skills.length === 0) {
+      (skills === null || (Array.isArray(skills) && skills.length === 0))) {
     console.log('Redirecting to SkillsChoose: no skills found');
     return <SkillsChoose />;
   }

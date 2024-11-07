@@ -9,6 +9,7 @@ const SkillsChoose = () => {
     const [selectedSkills, setSelectedSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasExistingSkills, setHasExistingSkills] = useState(false);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     const skills = [
@@ -30,15 +31,33 @@ const SkillsChoose = () => {
         const loadUserSkills = async () => {
             try {
                 const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-                if (telegramId) {
-                    const response = await getUserSkills(telegramId);
-                    if (response.skills && response.skills.length > 0) {
-                        setSelectedSkills(response.skills);
-                        setHasExistingSkills(true);
-                    }
+                if (!telegramId) {
+                    setError('Telegram ID not found');
+                    return;
+                }
+
+                const response = await getUserSkills(telegramId);
+                console.log('Skills response:', response);
+
+                if (!response) {
+                    setError('Failed to fetch skills');
+                    return;
+                }
+
+                // Handle null or undefined skills
+                if (response.skills === null || response.skills === undefined) {
+                    setSelectedSkills([]);
+                    setHasExistingSkills(false);
+                } else if (Array.isArray(response.skills) && response.skills.length > 0) {
+                    setSelectedSkills(response.skills);
+                    setHasExistingSkills(true);
+                } else {
+                    setSelectedSkills([]);
+                    setHasExistingSkills(false);
                 }
             } catch (error) {
                 console.error('Error loading skills:', error);
+                setError(error.message || 'Failed to load skills');
             } finally {
                 setLoading(false);
             }
@@ -66,11 +85,17 @@ const SkillsChoose = () => {
                 throw new Error('Telegram ID not found');
             }
 
-            await updateUserSkills(telegramId, selectedSkills);
-            navigate('/', { replace: true });
+            const response = await updateUserSkills(telegramId, selectedSkills);
+            
+            if (!response || response.error) {
+                throw new Error(response?.error || 'Failed to update skills');
+            }
+
+            // Refresh the page instead of using navigate
+            window.location.reload();
         } catch (error) {
             console.error('Error saving skills:', error);
-            // You might want to show an error message to the user
+            setError(error.message || 'Failed to save skills');
         } finally {
             setLoading(false);
         }
@@ -78,6 +103,18 @@ const SkillsChoose = () => {
 
     if (loading) {
         return <Loader />;
+    }
+
+    if (error) {
+        return (
+            <div className="skills-error123">
+                <h2>Error</h2>
+                <p>{error}</p>
+                <Button onClick={() => window.location.reload()}>
+                    Try Again
+                </Button>
+            </div>
+        );
     }
 
     return (
