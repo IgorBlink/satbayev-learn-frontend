@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router'; 
+import { HashRouter } from 'react-router-dom';
 import { createContext, useEffect, useState } from 'react'; 
 import { userAPI } from './api/userAPI/service'; 
 import { useNotification } from './helpers/Notificathions'; 
@@ -21,7 +22,6 @@ import Hometask from './pages/Hometask/Hometask';
 import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
 import { Backgroun } from './helpers/Background';
 import { getUserSkills, updateUserSkills } from './api/api';
-import { BrowserRouter } from 'react-router-dom';
 
 export const UserContext = createContext({ 
   user: null 
@@ -131,7 +131,7 @@ function App() {
   console.log('Rendering main app');
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <UserContext.Provider value={{ 
         user: user?.user || null,
         courses: user?.courses || [],
@@ -157,7 +157,7 @@ function App() {
           </Routes> 
         </div> 
       </UserContext.Provider>
-    </BrowserRouter>
+    </HashRouter>
   ); 
 } 
 
