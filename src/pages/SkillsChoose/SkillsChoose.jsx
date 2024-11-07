@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import './SkillsChoose.css';
 import { getUserSkills, updateUserSkills } from '../../api/api';
 import Loader from '../../helpers/Loader';
-import { useNotification } from './helpers/Notificathions'; 
+
 const SkillsChoose = () => {
     const [selectedSkills, setSelectedSkills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasExistingSkills, setHasExistingSkills] = useState(false);
     const navigate = useNavigate();
-    const { showNotification } = useNotification(); 
+
     const skills = [
         { id: 'html', name: 'HTML', icon: '🌐' },
         { id: 'css', name: 'CSS', icon: '🎨' },
@@ -67,11 +67,10 @@ const SkillsChoose = () => {
             }
 
             await updateUserSkills(telegramId, selectedSkills);
-            navigate('/', { replace: true });
+            navigate('/chat', { replace: true });
         } catch (error) {
             console.error('Error saving skills:', error);
-            // Add error notification
-            showNotification?.("Error", "Failed to save skills", "error");
+            // You might want to show an error message to the user
         } finally {
             setLoading(false);
         }
@@ -83,9 +82,6 @@ const SkillsChoose = () => {
 
     return (
         <div className="skills-container123">
-            <button className="back-button" onClick={() => navigate('/', { replace: true })}>
-                ← Back
-            </button>
             <div className="skills-banner123">
                 <h1 className="skills-title123">
                     {hasExistingSkills ? 'Change Your Skills' : 'Choose Your Path'}
