@@ -7,6 +7,7 @@ import Main from './pages/Main/Main';
 import MyCourses from './pages/MyCourses/MyCourses'; 
 import Statistics from './pages/Statistics/Statistics'; 
 import VibrateModule from './helpers/VibrateModule'; 
+import {ReactDOM} from "react" 
 import CoursesByCategory from "./pages/CoursesByCategory/CoursesByCategory"; 
 import Course from "./pages/Course/Course"; 
 import OverviewBlocks from './components/OverviewBlocks/OverviewBlocks';
@@ -19,31 +20,39 @@ import TestPage from './pages/TestPage/Test';
 import Hometask from './pages/Hometask/Hometask';
 import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
 import { Backgroun } from './helpers/Background';
-import { getUserSkills } from './api/api'; // Import the function to get user skills
-
+import { getUserSkills, updateUserSkills } from './api/api';
 export const UserContext = createContext({ 
   user: null 
 }) 
-
+ 
 function App() { 
   const { showNotification } = useNotification(); 
-
   const [user, setUser] = useState(null);
-  const [skills, setSkills] = useState(null); // State to store user skills
-  const [isUserLoading, setIsUserLoading] = useState(true); // Loading state for user
-  const [isSkillsLoading, setIsSkillsLoading] = useState(true); // Loading state for skills
-
-  // Fetch user data
+  const [skills, setSkills] = useState(null);
+  const [isUserLoading, setIsUserLoading] = useState(true);
+  const [isSkillsLoading, setIsSkillsLoading] = useState(false);  
+ 
   const fetchUser = async () => { 
+    setIsUserLoading(true);
     try {
       const response = await userAPI.getUser(); 
       console.log('fetchUser response:', response);
+      
       if(response.success === false) { 
         showNotification("Error", response.data.error, "error"); 
         setIsUserLoading(false);
         return;
       } 
-      setUser(response.data); 
+      
+      setUser(response.data);
+      
+      // Start skills loading only after successful user fetch
+      if (response.data?.user?.telegramId) {
+        setIsSkillsLoading(true);
+        await fetchSkills(response.data.user.telegramId);
+      } else {
+        setIsSkillsLoading(false); // Make sure to set loading to false if no telegramId
+      }
     } catch (error) {
       console.error('Error fetching user:', error);
       showNotification("Error", "Failed to fetch user data", "error");
@@ -52,13 +61,12 @@ function App() {
     }
   }; 
 
-  // Fetch skills data
   const fetchSkills = async (telegramId) => {
     try {
       const response = await getUserSkills(telegramId);
       console.log('fetchSkills response:', response);
       
-      if (response.skills && response.skills.length > 0) {
+      if (response && response.skills) {
         setSkills(response.skills);
       } else {
         setSkills([]);
@@ -72,55 +80,50 @@ function App() {
     }
   };
 
-  // Initialize on component mount
   useEffect(() => { 
     const htmlElement = document.documentElement;
     window?.Telegram?.WebApp?.expand();
     window?.Telegram?.WebApp?.disableVerticalSwipes();
-    
+
     if (htmlElement.classList.contains('dark')) {
       window?.Telegram?.WebApp?.setBackgroundColor("#000000");
       window?.Telegram?.WebApp?.setHeaderColor("#000000");
     }
 
-    fetchUser(); 
-  }, []); 
-
-  // Fetch skills once user data is available
-  useEffect(() => {
-    if (user?.user?.telegramId) {
-      fetchSkills(user.user.telegramId);
-    } else if (user) {
-      // If user data is available but no telegramId, stop loading to avoid infinite loader
-      setIsSkillsLoading(false);
-      showNotification("Error", "Telegram ID not found", "error");
-    }
-  }, [user]);
+    fetchUser();
+  }, []) 
 
   console.log('User:', user);
   console.log('Skills:', skills);
   console.log('Loading states:', { isUserLoading, isSkillsLoading });
 
-  // Show loader if either user or skills are loading
-  if (isUserLoading || isSkillsLoading) return <Loader />; 
+  // Show loader while either user or skills are loading
+  if (isUserLoading || isSkillsLoading) {
+    return <Loader />; 
+  }
 
   // Check for new user first
-  if (user?.user?.newUser) return <OverviewBlocks />;
+  if (user?.user?.newUser) {
+    console.log('Rendering OverviewBlocks for new user');
+    return <OverviewBlocks />;
+  }
 
-  // FIXED: Match exactly how SkillsChoose handles skills check
-  if (user?.user && !user.user.newUser) {
-    // If skills is null or empty array, show SkillsChoose
-    if (!skills || !skills.length) {
-      console.log('No skills found, showing SkillsChoose');
-      return <SkillsChoose />;
-    }
+  // Redirect to skills choose if:
+  // 1. User exists and is not new
+  // 2. Skills is null OR skills is an empty array
+  if (user?.user && 
+      !user.user.newUser && 
+      (skills === null || (Array.isArray(skills) && skills.length === 0))) {
+    console.log('Redirecting to SkillsChoose: no skills found');
+    return <SkillsChoose />;
   }
 
   // Regular app render for users with skills
+  console.log('Rendering main app with skills:', skills);
   return ( 
     <UserContext.Provider value={{ 
-      user: user.user,
-      courses: user.courses,
+      user: user?.user || null,
+      courses: user?.courses || [],
       setUser,
       fetchUser
     }}> 
