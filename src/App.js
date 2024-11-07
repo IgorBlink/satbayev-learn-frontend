@@ -60,10 +60,8 @@ function App() {
       
       if (response.skills && response.skills.length > 0) {
         setSkills(response.skills);
-        console.log(skills)
       } else {
         setSkills([]);
-        console.log(skills)
       }
     } catch (error) {
       console.error('Error fetching skills:', error);
@@ -101,21 +99,28 @@ function App() {
 
   console.log('User:', user);
   console.log('Skills:', skills);
+  console.log('Loading states:', { isUserLoading, isSkillsLoading });
 
   // Show loader if either user or skills are loading
   if (isUserLoading || isSkillsLoading) return <Loader />; 
+
+  // Check for new user first
   if (user?.user?.newUser) return <OverviewBlocks />;
 
-  // Redirect to SkillsChoose if skills array is empty and user is not new
-  if ((!skills?.length || skills === null)) {
-    console.log('No skills found, redirecting to SkillsChoose');
-    return <SkillsChoose />;
-}
+  // FIXED: Match exactly how SkillsChoose handles skills check
+  if (user?.user && !user.user.newUser) {
+    // If skills is null or empty array, show SkillsChoose
+    if (!skills || !skills.length) {
+      console.log('No skills found, showing SkillsChoose');
+      return <SkillsChoose />;
+    }
+  }
 
+  // Regular app render for users with skills
   return ( 
     <UserContext.Provider value={{ 
       user: user.user,
-      courses:  user.courses,
+      courses: user.courses,
       setUser,
       fetchUser
     }}> 
