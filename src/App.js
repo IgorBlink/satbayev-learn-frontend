@@ -20,133 +20,75 @@ import TestPage from './pages/TestPage/Test';
 import Hometask from './pages/Hometask/Hometask';
 import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
 import { Backgroun } from './helpers/Background';
-import { getUserSkills, updateUserSkills } from './api/api';
+ 
 export const UserContext = createContext({ 
   user: null 
 }) 
  
 function App() { 
   const { showNotification } = useNotification(); 
-  const [user, setUser] = useState(null);
-  const [skills, setSkills] = useState(null);
-  const [isUserLoading, setIsUserLoading] = useState(true);
-  const [isSkillsLoading, setIsSkillsLoading] = useState(false);  
+ 
+  const [user, setUser] = useState(null) 
  
   const fetchUser = async () => { 
-    setIsUserLoading(true);
-    try {
-      const response = await userAPI.getUser(); 
-      console.log('fetchUser response:', response);
-      
-      if(response.success === false) { 
-        showNotification("Error", response.data.error, "error"); 
-        setIsUserLoading(false);
-        return;
-      } 
-      
-      setUser(response.data);
-      
-      // Start skills loading only after successful user fetch
-      if (response.data?.user?.telegramId) {
-        setIsSkillsLoading(true);
-        await fetchSkills(response.data.user.telegramId);
-      } else {
-        setIsSkillsLoading(false); // Make sure to set loading to false if no telegramId
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      showNotification("Error", "Failed to fetch user data", "error");
-    } finally {
-      setIsUserLoading(false);
-    }
-  }; 
-
-  const fetchSkills = async (telegramId) => {
-    try {
-      const response = await getUserSkills(telegramId);
-      console.log('fetchSkills response:', response);
-      
-      if (response && response.skills) {
-        setSkills(response.skills);
-      } else {
-        setSkills([]);
-      }
-    } catch (error) {
-      console.error('Error fetching skills:', error);
-      showNotification("Error", "Failed to fetch skills", "error");
-      setSkills([]);
-    } finally {
-      setIsSkillsLoading(false);
-    }
-  };
-
+    const response = await userAPI.getUser() 
+ 
+    if(response.success === false) { 
+      return showNotification("Error", response.data.error, "error") 
+    } 
+ 
+    setUser(response.data) 
+  } 
+ 
   useEffect(() => { 
     const htmlElement = document.documentElement;
     window?.Telegram?.WebApp?.expand();
     window?.Telegram?.WebApp?.disableVerticalSwipes();
+    
 
     if (htmlElement.classList.contains('dark')) {
       window?.Telegram?.WebApp?.setBackgroundColor("#000000");
       window?.Telegram?.WebApp?.setHeaderColor("#000000");
     }
 
-    fetchUser();
+
+
+    fetchUser() 
   }, []) 
+ 
 
-  console.log('User:', user);
-  console.log('Skills:', skills);
-  console.log('Loading states:', { isUserLoading, isSkillsLoading });
-
-  // Show loader while either user or skills are loading
-  if (isUserLoading || isSkillsLoading) {
-    return <Loader />; 
-  }
-
-  // Check for new user first
-  if (user?.user?.newUser) {
-    console.log('Rendering OverviewBlocks for new user');
-    return <OverviewBlocks />;
-  }
-
-  // Redirect to skills choose if:
-  // 1. User exists and is not new
-  // 2. Skills is null OR skills is an empty array
-  if (user?.user && 
-      !user.user.newUser && 
-      (skills === null || (Array.isArray(skills) && skills.length === 0))) {
-    console.log('Redirecting to SkillsChoose: no skills found');
-    return <SkillsChoose />;
-  }
-
-  // Regular app render for users with skills
-  console.log('Rendering main app with skills:', skills);
+  console.log(user?.user)
+  if(user == null) return <Loader /> 
+  if(user?.user?.newUser) return <OverviewBlocks />
   return ( 
     <UserContext.Provider value={{ 
-      user: user?.user || null,
-      courses: user?.courses || [],
+      user: user.user,
+      courses:  user.courses,
       setUser,
       fetchUser
     }}> 
       <div className="app"> 
-        <Routes> 
-          <Route path='/' element={<Main />}/> 
-          <Route path='/statistics' element={<Statistics />}/> 
-          <Route path='/courses' element={<MyCourses />}/> 
-          <Route path='/courses/:id' element={<CoursesByCategory />}/> 
-          <Route path='/course/:id' element={<Course />}/> 
-          <Route path='/courses/:id/modules/:moduleId' element={<Module />}/> 
-          <Route path='/courses/:id/modules/:moduleId/test' element={<TestPage />}/> 
-          <Route path='/courses/:id/modules/:moduleId/homework' element={<Hometask />}/> 
-          <Route path='/top' element={<TopLider />}/>
-          <Route path='/history' element={<History />}/>
-          <Route path='/question/:id' element={<Question />}/>
-          <Route path='/result/:id' element={<ResultTest />}/>
-          <Route path='/skillschoose' element={<SkillsChoose/>}/>
-          <Route path='/*' element={<Navigate to="/" />}/>
+       
+          <Routes> 
+            <Route path='/' element={<Main />}/> 
+            <Route path='/statistics' element={<Statistics />}/> 
+            <Route path='/courses' element={<MyCourses />}/> 
+            <Route path='/courses/:id' element={<CoursesByCategory />}/> 
+            <Route path='/course/:id' element={<Course />}/> 
+            <Route path='/courses/:id/modules/:moduleId' element={<Module />}/> 
+            <Route path='/courses/:id/modules/:moduleId/test' element={<TestPage />}/> 
+            <Route path='/courses/:id/modules/:moduleId/homework' element={<Hometask />}/> 
+            <Route path='/top' element={<TopLider />}/>
+            <Route path='/history' element={<History />}/>
+            <Route path='/question/:id' element={<Question />}/>
+            <Route path='/result/:id' element={<ResultTest />}/>
+            <Route path='/skillschoose' element={<SkillsChoose/>}/>
+            <Route path='/*' element={<Navigate to="/" />}/>
+
         </Routes> 
       </div> 
     </UserContext.Provider> 
   ); 
 } 
-
+ 
 export default App;
