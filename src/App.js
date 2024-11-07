@@ -57,16 +57,18 @@ function App() {
     try {
       const response = await getUserSkills(telegramId);
       console.log('fetchSkills response:', response);
-      if (response.success === false) {
-        showNotification('Error', response.data.error, 'error');
-        setSkills([]); // Set to empty array to trigger redirect
+      
+      if (response.skills && response.skills.length > 0) {
+        setSkills(response.skills);
+        console.log(skills)
       } else {
-        setSkills(response.skills || []);
+        setSkills([]);
+        console.log(skills)
       }
     } catch (error) {
       console.error('Error fetching skills:', error);
       showNotification("Error", "Failed to fetch skills", "error");
-      setSkills([]); // Set to empty array to trigger redirect
+      setSkills([]);
     } finally {
       setIsSkillsLoading(false);
     }
