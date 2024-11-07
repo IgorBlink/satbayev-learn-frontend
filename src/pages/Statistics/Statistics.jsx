@@ -67,10 +67,10 @@ const Statistics = () => {
                 >
                     <div className="skills-redirect-content">
                         <div className="skills-redirect-text">
-                            <span className="skills-redirect-title">Choose Your Skills</span>
-                            <span className="skills-redirect-subtitle">Customize your learning path</span>
+                            <span className="skills-redirect-title">Unlock Your Potential ✨</span>
+                            <span className="skills-redirect-subtitle">Choose skills & start your journey</span>
                         </div>
-                        <span className="skills-redirect-icon">✨</span>
+                        <span className="skills-redirect-icon">🚀</span>
                     </div>
                 </div>
             </div>

@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@telegram-apps/telegram-ui";
+import { useNavigate } from 'react-router-dom';
 import './SkillsChoose.css';
+import { getUserSkills, updateUserSkills } from '../../api/api';
+import Loader from '../../helpers/Loader';
 
 const SkillsChoose = () => {
     const [selectedSkills, setSelectedSkills] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [hasExistingSkills, setHasExistingSkills] = useState(false);
+    const navigate = useNavigate();
 
     const skills = [
         { id: 'html', name: 'HTML', icon: '🌐' },
@@ -20,6 +26,27 @@ const SkillsChoose = () => {
         { id: 'security', name: 'Security', icon: '🔒' }
     ];
 
+    useEffect(() => {
+        const loadUserSkills = async () => {
+            try {
+                const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+                if (telegramId) {
+                    const response = await getUserSkills(telegramId);
+                    if (response.skills && response.skills.length > 0) {
+                        setSelectedSkills(response.skills);
+                        setHasExistingSkills(true);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading skills:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        loadUserSkills();
+    }, []);
+
     const toggleSkill = (skillId) => {
         if (selectedSkills.includes(skillId)) {
             setSelectedSkills(selectedSkills.filter(id => id !== skillId));
@@ -30,11 +57,41 @@ const SkillsChoose = () => {
         }
     };
 
+    const handleSubmit = async () => {
+        try {
+            setLoading(true);
+            const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+            
+            if (!telegramId) {
+                throw new Error('Telegram ID not found');
+            }
+
+            await updateUserSkills(telegramId, selectedSkills);
+            navigate('/chat', { replace: true });
+        } catch (error) {
+            console.error('Error saving skills:', error);
+            // You might want to show an error message to the user
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <Loader />;
+    }
+
     return (
         <div className="skills-container123">
             <div className="skills-banner123">
-                <h1 className="skills-title123">Choose Your Path</h1>
-                <p className="skills-subtitle123">Select up to 5 technologies you want to master</p>
+                <h1 className="skills-title123">
+                    {hasExistingSkills ? 'Change Your Skills' : 'Choose Your Path'}
+                </h1>
+                <p className="skills-subtitle123">
+                    {hasExistingSkills 
+                        ? 'Update your learning preferences'
+                        : 'Select up to 5 technologies you want to master'
+                    }
+                </p>
             </div>
 
             <div className="skills-grid123">
@@ -59,14 +116,14 @@ const SkillsChoose = () => {
                     {selectedSkills.length}/5 selected
                 </span>
                 <Button 
-                    disabled={selectedSkills.length === 0}
-                    onClick={() => console.log('Selected skills:', selectedSkills)}
+                    disabled={selectedSkills.length === 0 || loading}
+                    onClick={handleSubmit}
                 >
-                    Continue
+                    {loading ? 'Saving...' : (hasExistingSkills ? 'Update Skills' : 'Continue')}
                 </Button>
             </div>
         </div>
     );
 };
 
-export default SkillsChoose; 
+export default SkillsChoose;

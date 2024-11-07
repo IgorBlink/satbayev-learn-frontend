@@ -73,7 +73,7 @@ const OverviewBlocks = () => {
                             onClick={handleNavigation}
                             style={{ cursor: 'pointer' }}
                         >
-                            Start Learning!
+                           Choose skills to learn!
                         </Button>
                     }
                     description="Get on the leaderboard which is built from the number of points"
