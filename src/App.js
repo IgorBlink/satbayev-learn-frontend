@@ -59,7 +59,7 @@ function App() {
 
   console.log(user?.user)
   if(user == null) return <Loader /> 
-  if(user) return <OverviewBlocks />//?.user?.newUser
+  if(user?.user?.newUser) return <OverviewBlocks />
   return ( 
     <UserContext.Provider value={{ 
       user: user.user,
