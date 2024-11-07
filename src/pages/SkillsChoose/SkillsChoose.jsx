@@ -82,6 +82,9 @@ const SkillsChoose = () => {
 
     return (
         <div className="skills-container123">
+            <button className="back-button" onClick={() => navigate('/statistics')}>
+                ← Back
+            </button>
             <div className="skills-banner123">
                 <h1 className="skills-title123">
                     {hasExistingSkills ? 'Change Your Skills' : 'Choose Your Path'}
