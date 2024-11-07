@@ -106,8 +106,9 @@ function App() {
   if (isUserLoading || isSkillsLoading) return <Loader />; 
   if (user?.user?.newUser) return <OverviewBlocks />;
 
-  // Redirect to SkillsChoose if skills array is empty and user is not new
-  if (skills && skills.length === 0 && !user?.user?.newUser) {
+  // FIXED: Match the same logic as SkillsChoose.jsx for checking skills
+  if (user?.user && !user.user.newUser && (!skills?.length || skills === null)) {
+    console.log('No skills found, redirecting to SkillsChoose');
     return <SkillsChoose />;
   }
 
