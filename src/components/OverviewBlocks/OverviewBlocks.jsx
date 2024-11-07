@@ -1,5 +1,5 @@
 import { Button, Placeholder, Steps } from "@telegram-apps/telegram-ui";
-import { useState} from "react";
+import { useState } from "react";
 import WelcomeTgs from './../../assets/tgs/welcome.tgs';
 import WorldwideTgs from './../../assets/tgs/word_wide.tgs';
 import ApplePayTgs from './../../assets/tgs/ap_gp.tgs';
@@ -42,7 +42,7 @@ const OverviewBlocks = () => {
             {step === 1 ? (
                 <Placeholder 
                     action={<Button onClick={() => setStep(2)}>Let’s go!</Button>}
-                    description="SatbayevLearn is a learning platform right in Telegram! Let's tell you more about it"
+                    description="DecentraLearn is a learning platform right in Telegram! Let's tell you more about it"
                     header={`Welcome!`}
                 >
                     <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
@@ -59,18 +59,18 @@ const OverviewBlocks = () => {
                 <Placeholder 
                     action={<Button onClick={() => setStep(4)}>Nice</Button>}
                     description="Get rewarded for every module and course you complete. Withdraw directly to your TON wallet."
-                    header="SatbayevLearn points"
+                    header="DecentraLearn points"
                 >
                     <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
                 </Placeholder>
             ) : step === 4 ? (
                 <Placeholder 
-            action={<Button onClick={() => navigate('/skillschoose')}>Choose your path</Button>}
-            description="Get on the leaderboard which is built from the number of points"
-            header="Leaderboard"
-        >
-            <tgs-player autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
-        </Placeholder>
+                    action={<Button onClick={() => navigate('/skillschoose')}>Okay. Take me to the app</Button>}
+                    description="Get on the leaderboard which is built from the number of points"
+                    header="Leaderboard"
+                >
+                    <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
+                </Placeholder>
             ) : <Loader />}
         </div>
     );
