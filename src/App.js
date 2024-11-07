@@ -66,15 +66,16 @@ function App() {
       const response = await getUserSkills(telegramId);
       console.log('fetchSkills response:', response);
       
-      if (!response || response.success === false) {
-        console.log('No skills found or error');
-        setSkills([]); // Always set to empty array, not null
+      if (response.success === false) {
+        showNotification('Error', response.data.error, 'error');
+        setSkills([]); // Set to empty array instead of null
       } else {
-        setSkills(Array.isArray(response.skills) ? response.skills : []);
+        setSkills(response.skills || []); // Set to empty array if no skills
       }
     } catch (error) {
       console.error('Error fetching skills:', error);
-      setSkills([]); // Set to empty array on error
+      showNotification("Error", "Failed to fetch skills", "error");
+      setSkills([]); // Set to empty array instead of null
     } finally {
       setIsSkillsLoading(false);
     }
@@ -104,14 +105,21 @@ function App() {
 
   // Check for new user first
   if (user?.user?.newUser) {
+    console.log('Rendering OverviewBlocks for new user');
     return <OverviewBlocks />;
   }
 
-  // Redirect to skills choose if user exists but has no skills
-  if (!user.user.newUser && (skills === null || skills.length === 0)) {
-    return <SkillsChoose />
+  // Redirect to skills choose ONLY if user exists, is not new, and has no skills
+  if (user?.user && 
+      !user.user.newUser && 
+      Array.isArray(skills) && 
+      skills.length === 0) {
+    console.log('Redirecting to SkillsChoose: no skills found');
+    return <SkillsChoose />;
   }
 
+  // Regular app render for users with skills
+  console.log('Rendering main app with skills:', skills);
   return ( 
     <UserContext.Provider value={{ 
       user: user?.user || null,

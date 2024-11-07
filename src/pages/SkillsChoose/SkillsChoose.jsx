@@ -67,7 +67,7 @@ const SkillsChoose = () => {
             }
 
             await updateUserSkills(telegramId, selectedSkills);
-            navigate('/chat', { replace: true });
+            navigate('/', { replace: true });
         } catch (error) {
             console.error('Error saving skills:', error);
             // You might want to show an error message to the user
