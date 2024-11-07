@@ -1,5 +1,5 @@
 import { Button, Placeholder, Steps } from "@telegram-apps/telegram-ui";
-import { useState } from "react";
+import { useState, useNavigate } from "react";
 import WelcomeTgs from './../../assets/tgs/welcome.tgs';
 import WorldwideTgs from './../../assets/tgs/word_wide.tgs';
 import ApplePayTgs from './../../assets/tgs/ap_gp.tgs';
@@ -9,7 +9,7 @@ import Loader from "../../helpers/Loader";
 
 const OverviewBlocks = () => {
     const [step, setStep] = useState(1);
-
+    const navigate = useNavigate();
     const getTgsSrcForStep = (step) => {
         switch (step) {
             case 1:
