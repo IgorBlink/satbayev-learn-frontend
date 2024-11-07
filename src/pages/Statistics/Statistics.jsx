@@ -6,11 +6,11 @@ import StarIMG from "../../assets/images/star.png";
 import "./Satistics.css"
 import { userAPI } from '../../api/userAPI/service';
 import { useNotification } from '../../helpers/Notificathions';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 const Statistics = () => {
     const { showNotification } = useNotification();
-    const nav = useNavigate("/top")
+    const navigate = useNavigate();
 
     const [rating, setRating] = useState(null);
 
@@ -29,7 +29,7 @@ const Statistics = () => {
     return (
         <div style={{paddingTop:"24px", paddingBottom:"80px"}}>
             <div className="container">
-                    <Skeleton visible={rating === null} onClick={() => nav("/top")}>
+                    <Skeleton visible={rating === null} onClick={() => navigate("/top")}>
                         <Cell
                             before={<Avatar src={StarIMG} size={48} />}
                             description={`You're in ${rating?.place} place.`}
@@ -58,6 +58,20 @@ const Statistics = () => {
                 <div className="lite-banner">
                     <span className="title">Courses completed</span>
                     <span className={'count'}>1,000</span>
+                </div>
+
+                {/* New Skills Button */}
+                <div 
+                    className="skills-redirect-banner"
+                    onClick={() => navigate('/skillschoose')}
+                >
+                    <div className="skills-redirect-content">
+                        <div className="skills-redirect-text">
+                            <span className="skills-redirect-title">Choose Your Skills</span>
+                            <span className="skills-redirect-subtitle">Customize your learning path</span>
+                        </div>
+                        <span className="skills-redirect-icon">✨</span>
+                    </div>
                 </div>
             </div>
             <Footer active={3}/>
