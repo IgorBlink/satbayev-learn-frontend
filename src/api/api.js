@@ -1,102 +1,141 @@
-export const BASE_URL = "https://dl-back.km-dev.tech"
-export const SKILLS_URL = "https://93c4-2a03-32c0-7000-a4f6-f5de-47e6-cb46-9b42.ngrok-free.app"
-const token = window.btoa(window.Telegram.WebApp.initData)
+import { Navigate, Route, Routes } from 'react-router'; 
+import { createContext, useEffect, useState } from 'react'; 
+import { userAPI } from './api/userAPI/service'; 
+import { useNotification } from './helpers/Notificathions'; 
+import Loader from './helpers/Loader'; 
+import Main from './pages/Main/Main'; 
+import MyCourses from './pages/MyCourses/MyCourses'; 
+import Statistics from './pages/Statistics/Statistics'; 
+import VibrateModule from './helpers/VibrateModule'; 
+import CoursesByCategory from "./pages/CoursesByCategory/CoursesByCategory"; 
+import Course from "./pages/Course/Course"; 
+import OverviewBlocks from './components/OverviewBlocks/OverviewBlocks';
+import TopLider from "./pages/TopLider/TopLider";
+import History from "./pages/History/History";
+import Module from './pages/Module/Module';
+import Question from "./pages/Question/Question";
+import ResultTest from "./pages/ResultTesting/ResultTest";
+import TestPage from './pages/TestPage/Test';
+import Hometask from './pages/Hometask/Hometask';
+import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
+import { Backgroun } from './helpers/Background';
+import { getUserSkills } from './api/api'; // Import the function to get user skills
 
-// Base fetch function for main API
-export const fetchData = async (url, method, body = {}) => {
-    if(method === "GET") {
-        const response = await fetch(BASE_URL+url, {
-            headers: {
-                "ngrok-skip-browser-warning": "1",
-                Authorization: token
-            }
-        }).then(res => res.json())
-        return response
-        
-    } else {
-        const response = await fetch(BASE_URL+url , {
-            method,
-            body: JSON.stringify(body),
-            headers: {
-                "Content-Type": "application/json",
-                "ngrok-skip-browser-warning": "1",
-                Authorization: token
-            }
-        }).then(res => res.json())
+export const UserContext = createContext({ 
+  user: null 
+}) 
 
-        return response
-    }
-}
+function App() { 
+  const { showNotification } = useNotification(); 
 
-// New fetch function specifically for skills API
-const fetchSkillsData = async (url, method, body = {}) => {
+  const [user, setUser] = useState(null);
+  const [skills, setSkills] = useState(null); // State to store user skills
+  const [isUserLoading, setIsUserLoading] = useState(true); // Loading state for user
+  const [isSkillsLoading, setIsSkillsLoading] = useState(true); // Loading state for skills
+
+  // Fetch user data
+  const fetchUser = async () => { 
     try {
-        const headers = {
-            "ngrok-skip-browser-warning": "1",
-            Authorization: token
-        };
-
-        if (method !== "GET") {
-            headers["Content-Type"] = "application/json";
-        }
-
-        const options = {
-            method,
-            headers,
-            ...(method !== "GET" && { body: JSON.stringify(body) })
-        };
-
-        const response = await fetch(`${SKILLS_URL}${url}`, options);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
+      const response = await userAPI.getUser(); 
+      console.log('fetchUser response:', response);
+      if(response.success === false) { 
+        showNotification("Error", response.data.error, "error"); 
+        setIsUserLoading(false);
+        return;
+      } 
+      setUser(response.data); 
     } catch (error) {
-        console.error('Skills API Error:', error);
-        throw error;
+      console.error('Error fetching user:', error);
+      showNotification("Error", "Failed to fetch user data", "error");
+    } finally {
+      setIsUserLoading(false);
     }
-};
+  }; 
 
-// Skills-related functions using the new base URL
-export const getUserSkills = async (telegramId) => {
+  // Fetch skills data
+  const fetchSkills = async (telegramId) => {
     try {
-        const response = await fetchSkillsData(`/api/skills/${telegramId}`, 'GET');
-        console.log('Raw skills response:', response);
-        
-        // Ensure we return a consistent structure
-        return {
-            success: true,
-            skills: Array.isArray(response.skills) ? response.skills : []
-        };
+      const response = await getUserSkills(telegramId);
+      console.log('fetchSkills response:', response);
+      if (response.success === false) {
+        showNotification('Error', response.data.error, 'error');
+        setSkills([]); // Set to empty array to trigger redirect
+      } else {
+        setSkills(response.skills || []);
+      }
     } catch (error) {
-        console.error('Error fetching user skills:', error);
-        return {
-            success: false,
-            skills: []
-        };
+      console.error('Error fetching skills:', error);
+      showNotification("Error", "Failed to fetch skills", "error");
+      setSkills([]); // Set to empty array to trigger redirect
+    } finally {
+      setIsSkillsLoading(false);
     }
-};
+  };
 
-export const updateUserSkills = async (telegramId, skills) => {
-    try {
-        const response = await fetchSkillsData('/api/skills', 'POST', {
-            telegram_id: telegramId,
-            skills: skills
-        });
-        return response;
-    } catch (error) {
-        console.error('Error updating user skills:', error);
-        throw error;
+  // Initialize on component mount
+  useEffect(() => { 
+    const htmlElement = document.documentElement;
+    window?.Telegram?.WebApp?.expand();
+    window?.Telegram?.WebApp?.disableVerticalSwipes();
+    
+    if (htmlElement.classList.contains('dark')) {
+      window?.Telegram?.WebApp?.setBackgroundColor("#000000");
+      window?.Telegram?.WebApp?.setHeaderColor("#000000");
     }
-};
-// ... existing code ...
 
-export const getCourseRecommendations = async (telegramId) => {
-    try {
-        const response = await fetchSkillsData(`/api/recommend/${telegramId}`, 'GET');
-        return response;
-    } catch (error) {
-        console.error('Error getting recommendations:', error);
-        throw error;
+    fetchUser(); 
+  }, []); 
+
+  // Fetch skills once user data is available
+  useEffect(() => {
+    if (user?.user?.telegramId) {
+      fetchSkills(user.user.telegramId);
+    } else if (user) {
+      // If user data is available but no telegramId, stop loading to avoid infinite loader
+      setIsSkillsLoading(false);
+      showNotification("Error", "Telegram ID not found", "error");
     }
-};
+  }, [user]);
+
+  console.log('User:', user);
+  console.log('Skills:', skills);
+
+  // Show loader if either user or skills are loading
+  if (isUserLoading || isSkillsLoading) return <Loader />; 
+  if (user?.user?.newUser) return <OverviewBlocks />;
+
+  // Redirect to SkillsChoose if skills array is empty and user is not new
+  if (skills && skills.length === 0 && !user?.user?.newUser) {
+    return <SkillsChoose />;
+  }
+
+  return ( 
+    <UserContext.Provider value={{ 
+      user: user.user,
+      courses:  user.courses,
+      setUser,
+      fetchUser
+    }}> 
+      <div className="app"> 
+        <Routes> 
+          <Route path='/' element={<Main />}/> 
+          <Route path='/statistics' element={<Statistics />}/> 
+          <Route path='/courses' element={<MyCourses />}/> 
+          <Route path='/courses/:id' element={<CoursesByCategory />}/> 
+          <Route path='/course/:id' element={<Course />}/> 
+          <Route path='/courses/:id/modules/:moduleId' element={<Module />}/> 
+          <Route path='/courses/:id/modules/:moduleId/test' element={<TestPage />}/> 
+          <Route path='/courses/:id/modules/:moduleId/homework' element={<Hometask />}/> 
+          <Route path='/top' element={<TopLider />}/>
+          <Route path='/history' element={<History />}/>
+          <Route path='/question/:id' element={<Question />}/>
+          <Route path='/result/:id' element={<ResultTest />}/>
+          <Route path='/skillschoose' element={<SkillsChoose/>}/>
+          <Route path='/*' element={<Navigate to="/" />}/>
+        </Routes> 
+      </div> 
+    </UserContext.Provider> 
+  ); 
+} 
+
+export default App;
