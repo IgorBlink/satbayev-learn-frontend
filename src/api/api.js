@@ -61,10 +61,19 @@ const fetchSkillsData = async (url, method, body = {}) => {
 export const getUserSkills = async (telegramId) => {
     try {
         const response = await fetchSkillsData(`/api/skills/${telegramId}`, 'GET');
-        return response;
+        console.log('Raw skills response:', response);
+        
+        // Ensure we return a consistent structure
+        return {
+            success: true,
+            skills: Array.isArray(response.skills) ? response.skills : []
+        };
     } catch (error) {
         console.error('Error fetching user skills:', error);
-        throw error;
+        return {
+            success: false,
+            skills: []
+        };
     }
 };
 

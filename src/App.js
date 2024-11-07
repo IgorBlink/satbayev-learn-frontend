@@ -28,7 +28,7 @@ export const UserContext = createContext({
 function App() { 
   const { showNotification } = useNotification(); 
   const [user, setUser] = useState(null);
-  const [skills, setSkills] = useState(null);
+  const [skills, setSkills] = useState([]);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isSkillsLoading, setIsSkillsLoading] = useState(false);  
  
@@ -66,16 +66,15 @@ function App() {
       const response = await getUserSkills(telegramId);
       console.log('fetchSkills response:', response);
       
-      if (response.success === false) {
-        showNotification('Error', response.data.error, 'error');
-        setSkills([]); // Set to empty array instead of null
+      if (!response || response.success === false) {
+        console.log('No skills found or error');
+        setSkills([]); // Always set to empty array, not null
       } else {
-        setSkills(response.skills || []); // Set to empty array if no skills
+        setSkills(Array.isArray(response.skills) ? response.skills : []);
       }
     } catch (error) {
       console.error('Error fetching skills:', error);
-      showNotification("Error", "Failed to fetch skills", "error");
-      setSkills([]); // Set to empty array instead of null
+      setSkills([]); // Set to empty array on error
     } finally {
       setIsSkillsLoading(false);
     }
@@ -98,20 +97,36 @@ function App() {
   console.log('Skills:', skills);
   console.log('Loading states:', { isUserLoading, isSkillsLoading });
 
-  // Show loader while either user or skills are loading
+  // Add more detailed logging
+  console.log('Debug state:', {
+    user,
+    skills,
+    isUserLoading,
+    isSkillsLoading,
+    hasNewUser: user?.user?.newUser,
+    telegramId: user?.user?.telegramId
+  });
+
+  // Show loader while loading
   if (isUserLoading || isSkillsLoading) {
+    console.log('Showing loader');
     return <Loader />; 
   }
 
   // Check for new user first
   if (user?.user?.newUser) {
+    console.log('Showing overview blocks for new user');
     return <OverviewBlocks />;
   }
 
-  // Redirect to skills choose if user exists but has no skills
-  if (user?.user && !user.user.newUser && (skills === null || skills.length === 0)) {
+  // Check for skills redirect - simplified condition
+  if (user?.user && !skills?.length) {
+    console.log('Redirecting to skills choose');
     return <Navigate to="/skillschoose" replace />;
   }
+
+  // If we get here, we should have both user and skills
+  console.log('Rendering main app');
 
   return ( 
     <UserContext.Provider value={{ 
