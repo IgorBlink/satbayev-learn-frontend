@@ -10,6 +10,7 @@ import { useNotification } from '../../helpers/Notificathions';
 import { UserContext } from '../../App';
 import StarIMG from './../../assets/images/star.png';
 import { userAPI } from '../../api/userAPI/service';
+import RecommendedCourses from '../../components/RecommendedCourses/RecommendedCourses';
 
 const Main = () => {
     const nav = useNavigate();
@@ -68,6 +69,8 @@ const Main = () => {
                         </Cell>
                     </Skeleton>
                 </div>
+
+                <RecommendedCourses />
 
                 {allCategories === null ? <div className={'container'}><Skeleton visible={true} style={{width:"100%", height:"200px", marginTop:"30px", padding: "0 24px"}}></Skeleton></div> : <>
                 

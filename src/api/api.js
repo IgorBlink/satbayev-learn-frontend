@@ -80,3 +80,14 @@ export const updateUserSkills = async (telegramId, skills) => {
         throw error;
     }
 };
+// ... existing code ...
+
+export const getCourseRecommendations = async (telegramId) => {
+    try {
+        const response = await fetchSkillsData(`/api/recommend/${telegramId}`, 'GET');
+        return response;
+    } catch (error) {
+        console.error('Error getting recommendations:', error);
+        throw error;
+    }
+};
