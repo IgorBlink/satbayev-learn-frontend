@@ -66,16 +66,15 @@ function App() {
       const response = await getUserSkills(telegramId);
       console.log('fetchSkills response:', response);
       
-      if (response.success === false) {
-        showNotification('Error', response.data.error, 'error');
-        setSkills([]); // Set to empty array instead of null
+      if (response && response.skills) {
+        setSkills(response.skills);
       } else {
-        setSkills(response.skills || []); // Set to empty array if no skills
+        setSkills([]);
       }
     } catch (error) {
       console.error('Error fetching skills:', error);
       showNotification("Error", "Failed to fetch skills", "error");
-      setSkills([]); // Set to empty array instead of null
+      setSkills([]);
     } finally {
       setIsSkillsLoading(false);
     }
