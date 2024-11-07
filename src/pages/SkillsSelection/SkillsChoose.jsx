@@ -3,7 +3,7 @@ import './SkillsSelection.css';
 import { userAPI } from '../../api/userAPI/service';
 import { useNotification } from '../../helpers/Notificathions';
 
-const SkillsSelection = () => {
+const SkillsChoose = () => {
     const { showNotification } = useNotification();
     const [selectedSkills, setSelectedSkills] = useState([]);
 
@@ -85,4 +85,4 @@ const SkillsSelection = () => {
     );
 };
 
-export default SkillsSelection; 
+export default SkillsChoose; 

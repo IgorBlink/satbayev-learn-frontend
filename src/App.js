@@ -18,6 +18,7 @@ import Question from "./pages/Question/Question";
 import ResultTest from "./pages/ResultTesting/ResultTest";
 import TestPage from './pages/TestPage/Test';
 import Hometask from './pages/Hometask/Hometask';
+import SkillsChoose from './pages/SkillSelection/SkillsChoose';
 import { Backgroun } from './helpers/Background';
  
 export const UserContext = createContext({ 
@@ -81,7 +82,9 @@ function App() {
             <Route path='/history' element={<History />}/>
             <Route path='/question/:id' element={<Question />}/>
             <Route path='/result/:id' element={<ResultTest />}/>
+            <Route path='/skillschoose' element={<SkillsChoose/>}/>
             <Route path='/*' element={<Navigate to="/" />}/>
+
         </Routes> 
       </div> 
     </UserContext.Provider> 
