@@ -106,11 +106,11 @@ function App() {
   if (isUserLoading || isSkillsLoading) return <Loader />; 
   if (user?.user?.newUser) return <OverviewBlocks />;
 
-  // FIXED: Match the same logic as SkillsChoose.jsx for checking skills
-  if (user?.user && !user.user.newUser && (!skills?.length || skills === null)) {
+  // Redirect to SkillsChoose if skills array is empty and user is not new
+  if ((!skills?.length || skills === null)) {
     console.log('No skills found, redirecting to SkillsChoose');
     return <SkillsChoose />;
-  }
+}
 
   return ( 
     <UserContext.Provider value={{ 
