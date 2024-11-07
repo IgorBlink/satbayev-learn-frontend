@@ -28,7 +28,7 @@ export const UserContext = createContext({
 function App() { 
   const { showNotification } = useNotification(); 
   const [user, setUser] = useState(null);
-  const [skills, setSkills] = useState([]);
+  const [skills, setSkills] = useState(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isSkillsLoading, setIsSkillsLoading] = useState(false);  
  
@@ -97,36 +97,20 @@ function App() {
   console.log('Skills:', skills);
   console.log('Loading states:', { isUserLoading, isSkillsLoading });
 
-  // Add more detailed logging
-  console.log('Debug state:', {
-    user,
-    skills,
-    isUserLoading,
-    isSkillsLoading,
-    hasNewUser: user?.user?.newUser,
-    telegramId: user?.user?.telegramId
-  });
-
-  // Show loader while loading
+  // Show loader while either user or skills are loading
   if (isUserLoading || isSkillsLoading) {
-    console.log('Showing loader');
     return <Loader />; 
   }
 
   // Check for new user first
   if (user?.user?.newUser) {
-    console.log('Showing overview blocks for new user');
     return <OverviewBlocks />;
   }
 
-  // Check for skills redirect - simplified condition
-  if (user?.user &&  skills?.length === 0) {
-    console.log('Redirecting to skills choose');
-    return <SkillsChoose />;  
+  // Redirect to skills choose if user exists but has no skills
+  if (!user.user.newUser && (skills === null || skills.length === 0)) {
+    return <SkillsChoose />
   }
-
-  // If we get here, we should have both user and skills
-  console.log('Rendering main app');
 
   return ( 
     <UserContext.Provider value={{ 
