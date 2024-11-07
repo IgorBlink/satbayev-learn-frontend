@@ -17,16 +17,13 @@ import Question from "./pages/Question/Question";
 import ResultTest from "./pages/ResultTesting/ResultTest";
 import TestPage from './pages/TestPage/Test';
 import Hometask from './pages/Hometask/Hometask';
-import SkillsChoose from './pages/SkillsChoose/SkillsChoose';
+import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
 import { Backgroun } from './helpers/Background';
 import { getUserSkills } from './api/api'; // Import the function to get user skills
 
 export const UserContext = createContext({ 
-  user: null,
-  courses: [],
-  setUser: () => {},
-  fetchUser: () => {}
-}); 
+  user: null 
+}) 
 
 function App() { 
   const { showNotification } = useNotification(); 
