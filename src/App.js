@@ -27,6 +27,7 @@ export const UserContext = createContext({
  
 function App() { 
   const { showNotification } = useNotification(); 
+  const [user, setUser] = useState(null);
   const [skills, setSkills] = useState(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isSkillsLoading, setIsSkillsLoading] = useState(false);  
