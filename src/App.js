@@ -108,7 +108,7 @@ function App() {
   if (user?.user?.newUser) return <OverviewBlocks />;
 
   // Redirect to SkillsChoose if skills array is empty and user is not new
-  if (skills && skills.length === 0 && !user?.user?.newUser) {
+  if (skills === null && !user?.user?.newUser) {
     return <Navigate to="/skillschoose" replace />;
   }
 
