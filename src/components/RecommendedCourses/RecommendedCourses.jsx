@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Card, Button, Skeleton } from '@telegram-apps/telegram-ui';
+import { Card, Button, Skeleton, Modal } from '@telegram-apps/telegram-ui';
 import { getCourseRecommendations } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../App';
 import { useNotification } from '../../helpers/Notificathions';
+import { coursesAPI } from '../../api/coursesAPI/service';
 import './RecommendedCourses.css';
 
 const RecommendedCourses = () => {
     const [recommendations, setRecommendations] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadingStart, setLoadingStart] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const { showNotification } = useNotification();
-    const { user, courses: userCourses } = useContext(UserContext);
+    const { user, courses: userCourses, fetchUser } = useContext(UserContext);
 
     useEffect(() => {
         const loadRecommendations = async () => {
@@ -38,30 +40,7 @@ const RecommendedCourses = () => {
                             "category": "672c753f0c8b0afe26998847",
                             "bonus": 500
                         },
-                        {
-                            "id": "672c753f0c8b0afe26998848",
-                            "title": "React: the complete guide with test",
-                            "description": "Learn React from scratch",
-                            "image": "https://img-b.udemycdn.com/course/240x135/1565838_e54e_18.jpg",
-                            "author": "Igor Blink",
-                            "price": 0,
-                            "currency": "DL",
-                            "minimumSkill": "beginner",
-                            "category": "672c753f0c8b0afe26998847",
-                            "bonus": 800
-                        },
-                        {
-                            "id": "672c753f0c8b0afe26998849",
-                            "title": "Getting started with SwiftUI with test",
-                            "description": "Learn SwiftUI from scratch",
-                            "image": "https://img-c.udemycdn.com/course/240x135/1778502_f4b9_12.jpg",
-                            "author": "Igor Blink",
-                            "price": 0,
-                            "currency": "DL",
-                            "minimumSkill": "beginner",
-                            "category": "672c753f0c8b0afe26998848",
-                            "bonus": 1500
-                        }
+                        // ... other courses
                     ];
 
                     // Filter out courses that user has already started
@@ -83,12 +62,22 @@ const RecommendedCourses = () => {
         loadRecommendations();
     }, [userCourses, showNotification]);
 
-    const handleStartCourse = (course) => {
+    const handleStartCourse = async (course) => {
+        setLoadingStart(true);
         try {
-            navigate(`/courses/${course.category}`);
+            const response = await coursesAPI.startCourse(course.id);
+            if (response.success === false) {
+                showNotification('Error', response.data.error, 'error');
+                return;
+            }
+            await fetchUser();
+            showNotification('Success', "You have successfully started a course", 'success');
+            navigate(`/course/${course.id}`);
         } catch (error) {
             console.error('Error starting course:', error);
             showNotification('Error', 'Failed to start course', 'error');
+        } finally {
+            setLoadingStart(false);
         }
     };
 
@@ -125,7 +114,7 @@ const RecommendedCourses = () => {
                                 <span className="course-bonus">+{course.bonus} DL</span>
                             </div>
                             <div className="course-price">
-                                <span>Free</span>
+                                <span>{course.price === 0 ? 'Free' : `${course.price} ${course.currency}`}</span>
                             </div>
                         </div>
                         
@@ -146,6 +135,8 @@ const RecommendedCourses = () => {
                                     size="m" 
                                     className="start-course-btn"
                                     onClick={() => handleStartCourse(course)}
+                                    loading={loadingStart}
+                                    mode="gray"
                                 >
                                     Start Learning
                                 </Button>
