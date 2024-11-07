@@ -1,6 +1,11 @@
 .recommended-section {
-    padding: 20px;
     margin: 24px 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.recommended-section .container {
+    padding: 0 16px;
 }
 
 .recommended-title {
@@ -29,6 +34,9 @@
     overflow: hidden;
     transition: transform 0.2s ease;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
 }
 
 .recommended-course-card:hover {
@@ -76,6 +84,7 @@
     display: flex;
     flex-direction: column;
     height: calc(100% - 200px); /* Adjust based on image height */
+    flex: 1;
 }
 
 .course-header {
@@ -104,7 +113,7 @@
 
 .course-footer {
     margin-top: auto;
-    padding-top: 16px;
+    padding-top: 12px;
 }
 
 .start-course-btn {
@@ -172,24 +181,80 @@
     pointer-events: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .recommended-courses {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
     
-    .recommended-section {
-        padding: 16px;
+    .course-content {
+        padding: 12px;
+    }
+    
+    .course-title {
+        font-size: 16px;
+    }
+    
+    .course-description {
+        font-size: 13px;
+    }
+    
+    .recommended-title {
+        font-size: 20px;
+    }
+    
+    .recommended-subtitle {
+        font-size: 14px;
+    }
+    
+    .course-image-wrapper {
+        padding-top: 66.67%; /* 3:2 aspect ratio for mobile */
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+/* Tablet improvements */
+@media (min-width: 481px) and (max-width: 768px) {
     .recommended-courses {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .course-content {
+        padding: 14px;
     }
 }
 
-@media (min-width: 1025px) {
+/* Ensure cards don't get too wide on large screens */
+@media (min-width: 1200px) {
     .recommended-courses {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        max-width: 1200px;
+        margin: 16px auto;
     }
+}
+
+/* Fix container padding */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Improve card height consistency */
+.recommended-course-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 400px;
+}
+
+.course-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.course-footer {
+    margin-top: auto;
+    padding-top: 12px;
 } 

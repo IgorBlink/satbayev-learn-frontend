@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Skeleton } from '@telegram-apps/telegram-ui';
 import { getCourseRecommendations } from '../../api/api';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../App';
+import { useNotification } from '../../helpers/Notificathions';
 import './RecommendedCourses.css';
 
 const RecommendedCourses = () => {
     const [recommendations, setRecommendations] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    const { showNotification } = useNotification();
+    const { user, courses: userCourses } = useContext(UserContext);
 
     useEffect(() => {
         const loadRecommendations = async () => {
@@ -14,13 +20,12 @@ const RecommendedCourses = () => {
                 const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
                 if (telegramId) {
                     const response = await getCourseRecommendations(telegramId);
-                    // Extract course titles from Gemini's response
                     const recommendedTitles = response.recommendations
-                        .replace(/```json\n|\n```/g, '') // Remove JSON code block markers
+                        .replace(/```json\n|\n```/g, '')
                         .trim();
                     const titles = JSON.parse(recommendedTitles);
                     
-                    // Find full course details from COURSES data
+                    // Filter out courses that user has already started
                     const COURSES = [
                         {
                             "title": "Web Development: from Zero to Hero with test",
@@ -57,29 +62,42 @@ const RecommendedCourses = () => {
                         }
                     ];
 
-                    const fullCourseDetails = titles.map(title => 
-                        COURSES.find(course => course.title === title)
-                    ).filter(Boolean);
+                    const availableCourses = COURSES.filter(course => 
+                        titles.includes(course.title) && 
+                        !userCourses.some(userCourse => userCourse.id === course.id)
+                    );
 
-                    setRecommendations(fullCourseDetails);
+                    setRecommendations(availableCourses);
                 }
             } catch (error) {
                 console.error('Error loading recommendations:', error);
                 setError('Failed to load recommendations');
+                showNotification('Error', 'Failed to load recommendations', 'error');
             } finally {
                 setLoading(false);
             }
         };
 
         loadRecommendations();
-    }, []);
+    }, [userCourses, showNotification]);
+
+    const handleStartCourse = (course) => {
+        try {
+            navigate(`/course/${course.id}`);
+        } catch (error) {
+            console.error('Error starting course:', error);
+            showNotification('Error', 'Failed to start course', 'error');
+        }
+    };
 
     if (loading) {
         return (
-            <div className="recommended-section container">
-                <Skeleton visible={true} className="recommended-skeleton">
-                    <div style={{ height: "400px" }}></div>
-                </Skeleton>
+            <div className="recommended-section">
+                <div className="container">
+                    <Skeleton visible={true} className="recommended-skeleton">
+                        <div style={{ height: "400px" }}></div>
+                    </Skeleton>
+                </div>
             </div>
         );
     }
@@ -89,50 +107,54 @@ const RecommendedCourses = () => {
     }
 
     return (
-        <div className="recommended-section container">
-            <h2 className="recommended-title">Recommended for You</h2>
-            <p className="recommended-subtitle">Based on your skills</p>
-            
-            <div className="recommended-courses">
-                {recommendations.map((course, index) => (
-                    <Card key={index} className="recommended-course-card">
-                        <div className="course-image-wrapper">
-                            <img 
-                                src={course.image} 
-                                alt={course.title} 
-                                className="course-image"
-                            />
-                            <div className="course-overlay">
-                                <span className="course-bonus">+{course.bonus} DL</span>
-                            </div>
-                            <div className="course-price">
-                                <span>Free</span>
-                            </div>
-                        </div>
-                        
-                        <div className="course-content">
-                            <div className="course-header">
-                                <h3 className="course-title">{course.title}</h3>
-                                <span className="course-author">by {course.author}</span>
+        <div className="recommended-section">
+            <div className="container">
+                <h2 className="recommended-title">Recommended for You</h2>
+                <p className="recommended-subtitle">Based on your skills</p>
+                
+                <div className="recommended-courses">
+                    {recommendations.map((course, index) => (
+                        <Card key={index} className="recommended-course-card">
+                            <div className="course-image-wrapper">
+                                <img 
+                                    src={course.image} 
+                                    alt={course.title} 
+                                    className="course-image"
+                                    loading="lazy"
+                                />
+                                <div className="course-overlay">
+                                    <span className="course-bonus">+{course.bonus} DL</span>
+                                </div>
+                                <div className="course-price">
+                                    <span>{course.price === 0 ? 'Free' : `${course.price} ${course.currency}`}</span>
+                                </div>
                             </div>
                             
-                            <p className="course-description">{course.description}</p>
-                            
-                            <div className="course-meta">
-                                <span className="course-level">Level: {course.minimumSkill}</span>
+                            <div className="course-content">
+                                <div className="course-header">
+                                    <h3 className="course-title">{course.title}</h3>
+                                    <span className="course-author">by {course.author}</span>
+                                </div>
+                                
+                                <p className="course-description">{course.description}</p>
+                                
+                                <div className="course-meta">
+                                    <span className="course-level">Level: {course.minimumSkill}</span>
+                                </div>
+                                
+                                <div className="course-footer">
+                                    <Button 
+                                        size="m" 
+                                        className="start-course-btn"
+                                        onClick={() => handleStartCourse(course)}
+                                    >
+                                        Start Learning
+                                    </Button>
+                                </div>
                             </div>
-                            
-                            <div className="course-footer">
-                                <Button 
-                                    size="m" 
-                                    className="start-course-btn"
-                                >
-                                    Start Learning
-                                </Button>
-                            </div>
-                        </div>
-                    </Card>
-                ))}
+                        </Card>
+                    ))}
+                </div>
             </div>
         </div>
     );
