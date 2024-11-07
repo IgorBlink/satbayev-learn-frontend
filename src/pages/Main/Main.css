@@ -1,0 +1,33 @@
+
+.banner{
+    height: 111px;
+    background-color: var(--tg-theme-secondary-bg-color);
+    margin: 24px 0 12px 0;
+    border-radius: 12px;
+}
+
+.b-img{
+    background-image: url('../../assets/images/starBanner.svg');
+    background-repeat: no-repeat;
+    position: relative;
+    background-position: bottom -5px right 5px;
+}
+
+.banner .content{
+    display: grid;
+    justify-content: center;
+    text-align: center;
+    margin-top: 0;
+}
+
+.banner .content .title{
+    color: var(--tg-theme-link-color);
+    margin: 24px 0 5px 0;
+}
+
+.banner .content .description{
+    font-size: 15px;
+    color: var(--tg-theme-subtitle-text-color);
+}
+
+

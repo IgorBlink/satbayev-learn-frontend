@@ -1,0 +1,30 @@
+#Withdraw {
+    width: 100%;
+    margin-bottom: 24px;
+    background-color: var(--tg-theme-link-color);
+    color: var(--tgui--white);
+}
+
+
+.list-history .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    margin: 10px 0;
+}
+
+.list-history .history-item span{
+    padding-right: 10px;
+}
+
+.list-history .history-item .amount-green{
+    color: var(--tgui--green);
+}
+
+.list-history .history-item .amount-red{
+    color: var(--tgui--destructive_text_color);
+}
+
