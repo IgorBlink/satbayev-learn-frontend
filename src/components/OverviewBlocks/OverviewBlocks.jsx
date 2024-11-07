@@ -1,12 +1,12 @@
 import { Button, Placeholder, Steps } from "@telegram-apps/telegram-ui";
-import { useState, useNavigate } from "react";
+import { useState} from "react";
 import WelcomeTgs from './../../assets/tgs/welcome.tgs';
 import WorldwideTgs from './../../assets/tgs/word_wide.tgs';
 import ApplePayTgs from './../../assets/tgs/ap_gp.tgs';
 import PaymentsTgs from './../../assets/tgs/payments.tgs';
 import KycTgs from './../../assets/tgs/kyc.tgs';
 import Loader from "../../helpers/Loader";
-
+import { useNavigate } from "react-router-dom";
 const OverviewBlocks = () => {
     const [step, setStep] = useState(1);
     const navigate = useNavigate();
