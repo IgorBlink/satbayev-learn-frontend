@@ -1,38 +1,41 @@
 import { Button, Placeholder, Steps } from "@telegram-apps/telegram-ui";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import WelcomeTgs from './../../assets/tgs/welcome.tgs';
 import WorldwideTgs from './../../assets/tgs/word_wide.tgs';
 import ApplePayTgs from './../../assets/tgs/ap_gp.tgs';
 import PaymentsTgs from './../../assets/tgs/payments.tgs';
 import KycTgs from './../../assets/tgs/kyc.tgs';
 import Loader from "../../helpers/Loader";
-import { useNavigate } from "react-router-dom";
+
 const OverviewBlocks = () => {
     const [step, setStep] = useState(1);
     const navigate = useNavigate();
+
+    const handleNavigation = () => {
+        try {
+            navigate('/skillschoose', { replace: true });
+        } catch (error) {
+            console.error('Navigation error:', error);
+            // Fallback navigation
+            window.location.href = '/skillschoose';
+        }
+    };
+
     const getTgsSrcForStep = (step) => {
         switch (step) {
-            case 1:
-                return WelcomeTgs;
-            case 2:
-                return WorldwideTgs;
-            case 3:
-                return ApplePayTgs;
-            case 4:
-                return PaymentsTgs;
-            case 5:
-                return KycTgs;
-            default:
-                return WelcomeTgs; 
+            case 1: return WelcomeTgs;
+            case 2: return WorldwideTgs;
+            case 3: return ApplePayTgs;
+            case 4: return PaymentsTgs;
+            case 5: return KycTgs;
+            default: return WelcomeTgs;
         }
     };
 
     return (
         <div className="overview__blocks">
-            <div className="overview__blocks__steps" onClick={() => setStep(prev => {
-                        if (prev === 1) return 1;
-                        return prev - 1;
-                    })}>
+            <div className="overview__blocks__steps">
                 <Steps
                     count={4}
                     progress={step}
@@ -41,11 +44,11 @@ const OverviewBlocks = () => {
 
             {step === 1 ? (
                 <Placeholder 
-                    action={<Button onClick={() => setStep(2)}>Let’s go!</Button>}
+                    action={<Button onClick={() => setStep(2)}>Let's go!</Button>}
                     description="DecentraLearn is a learning platform right in Telegram! Let's tell you more about it"
                     header={`Welcome!`}
                 >
-                    <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
+                    <tgs-player autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
                 </Placeholder>
             ) : step === 2 ? ( 
                 <Placeholder 
@@ -53,7 +56,7 @@ const OverviewBlocks = () => {
                     description="We provide over 50 courses on a variety of topics"
                     header="Learn anything"
                 >
-                    <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
+                    <tgs-player autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
                 </Placeholder>
             ) : step === 3 ? (
                 <Placeholder 
@@ -61,15 +64,22 @@ const OverviewBlocks = () => {
                     description="Get rewarded for every module and course you complete. Withdraw directly to your TON wallet."
                     header="DecentraLearn points"
                 >
-                    <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
+                    <tgs-player autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
                 </Placeholder>
             ) : step === 4 ? (
                 <Placeholder 
-                    action={<Button onClick={() => navigate('/skillschoose')}>Okay. Take me to the app</Button>}
+                    action={
+                        <Button 
+                            onClick={handleNavigation}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            Start Learning!
+                        </Button>
+                    }
                     description="Get on the leaderboard which is built from the number of points"
                     header="Leaderboard"
                 >
-                    <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
+                    <tgs-player autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
                 </Placeholder>
             ) : <Loader />}
         </div>
