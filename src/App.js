@@ -18,7 +18,7 @@ import Question from "./pages/Question/Question";
 import ResultTest from "./pages/ResultTesting/ResultTest";
 import TestPage from './pages/TestPage/Test';
 import Hometask from './pages/Hometask/Hometask';
-import SkillsChoose from './pages/SkillSelection/SkillsChoose';
+import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
 import { Backgroun } from './helpers/Background';
  
 export const UserContext = createContext({ 
