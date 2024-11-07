@@ -1,0 +1,24 @@
+.question {
+    margin-bottom: 24px;
+}
+
+.quest-img{
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.answer-list{
+    margin: 24px 0;
+}
+
+.answer-list .answer-item{
+    margin: 10px 0;
+}
+
+#question-submit{
+    background-color: var(--tooltip_background_dark);
+    color: var(--tg-theme-button-color);
+    width: 100%;
+    margin-top: 24px;
+}

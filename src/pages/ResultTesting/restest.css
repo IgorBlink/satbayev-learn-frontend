@@ -1,0 +1,32 @@
+
+.center-block{
+    width: 100%;
+    display: grid;
+    align-items: center;
+    margin: 25vh 0;
+    justify-content: center;
+    text-align: center;
+}
+
+#res-img{
+    width: 50%;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.center-block #balls{
+    font-weight: 590;
+    font-size: 22px;
+    margin-top: 10px;
+}
+
+.center-block #comment {
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 10px;
+}
+
+.center-block #res-but{
+    width: 100%;
+    margin-top: 24px;
+}
