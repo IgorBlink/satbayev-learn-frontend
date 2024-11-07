@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Banner from '../../components/Banner';
 import Slider from '../../components/Slider';
 import './Main.css';
-import { Cell, Avatar, Skeleton, Placeholder, Button } from '@telegram-apps/telegram-ui';
+import { Cell, Avatar, Skeleton, Placeholder } from '@telegram-apps/telegram-ui';
 import Footer from '../../components/Footer';
 import { useNavigate } from 'react-router';
 import { coursesAPI } from '../../api/coursesAPI/service';
@@ -20,7 +20,6 @@ const Main = () => {
     const [allCategories, setAllCategories] = useState(null);
     const [courses, setCourses] = useState(null);
     const [rating, setRating] = useState(null);
-    const [recommendations, setRecommendations] = useState(null);
 
     useEffect(() => {
         async function getCoursesData() {
@@ -40,28 +39,21 @@ const Main = () => {
             setRating(response.data);
         }
 
-        async function fetchRecommendations() {
-            try {
-                const response = await userAPI.getCourseRecommendations(user.user.telegramId);
-                if (response.success === false || !response.recommendations) {
-                    setRecommendations([]);
-                } else {
-                    setRecommendations(response.recommendations);
-                }
-            } catch (error) {
-                console.error('Error fetching recommendations:', error);
-                setRecommendations([]);
-            }
-        }
-
         getRatingUser();
         getCoursesData();
-        fetchRecommendations();
-    }, [user]);
+    }, []);
 
     const getCoursesByCategory = (categoryId) => {
         return courses.filter(course => course.category === categoryId);
     };
+
+
+    /*const userHasIncompleteCourses = userCourses && allCategories && allCategories.some(category => {
+        const categoryCourses = getCoursesByCategory(category.id);
+        return categoryCourses.some(course => 
+            !userCourses.some(data => data.id === course.id)
+        );
+    });*/
 
     return (
         <div>
@@ -78,18 +70,7 @@ const Main = () => {
                     </Skeleton>
                 </div>
 
-                {recommendations && recommendations.length > 0 ? (
-                    <RecommendedCourses />
-                ) : (
-                    <div className="container">
-                        <Placeholder header="Nothing to recommend">
-                            <p>Maybe choose some skills?</p>
-                            <Button onClick={() => nav('/skillschoose')} size="l">
-                                Choose Skills
-                            </Button>
-                        </Placeholder>
-                    </div>
-                )}
+                <RecommendedCourses />
 
                 {allCategories === null ? <div className={'container'}><Skeleton visible={true} style={{width:"100%", height:"200px", marginTop:"30px", padding: "0 24px"}}></Skeleton></div> : <>
                 
@@ -124,6 +105,8 @@ const Main = () => {
                     </div>
                 )}
                 </>}
+                
+
             </div>
 
             <Footer active={1} />
