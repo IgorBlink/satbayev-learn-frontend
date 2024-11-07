@@ -1,4 +1,4 @@
-export const BASE_URL = "localhost:3000" //https://dl-back.km-dev.tech
+export const BASE_URL = "https://dl-back.km-dev.tech" //https://dl-back.km-dev.tech
 const token = window.btoa(window.Telegram.WebApp.initData)
 // const token = "cXVlcnlfaWQ9QUFGRUR6Uk5BQUFBQUVRUE5FMG50bzRIJnVzZXI9JTdCJTIyaWQlMjIlM0ExMjk1MjU3NDEyJTJDJTIyZmlyc3RfbmFtZSUyMiUzQSUyMkRhbmlpbCUyMiUyQyUyMmxhc3RfbmFtZSUyMiUzQSUyMiUyMiUyQyUyMnVzZXJuYW1lJTIyJTNBJTIyZDlBMm5ZM0ElMjIlMkMlMjJsYW5ndWFnZV9jb2RlJTIyJTNBJTIyZW4lMjIlMkMlMjJpc19wcmVtaXVtJTIyJTNBdHJ1ZSUyQyUyMmFsbG93c193cml0ZV90b19wbSUyMiUzQXRydWUlN0QmYXV0aF9kYXRlPTE3MjkwMDQxODgmaGFzaD1iYWQ4MGY2ZWRjMjQyOGFmYTg1YjUwOTlhNDAyMGNkMjI0YjRlOWQ4N2FiOTYzMmVmNGYxMGExNGRmNzRiNDNj"
 
