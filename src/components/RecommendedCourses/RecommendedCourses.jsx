@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Card, Button, Skeleton, Modal } from '@telegram-apps/telegram-ui';
+import { Card, Button, Skeleton, Modal, Cell, Avatar } from '@telegram-apps/telegram-ui';
+import { ModalHeader } from "@telegram-apps/telegram-ui/dist/components/Overlays/Modal/components/ModalHeader/ModalHeader";
 import { getCourseRecommendations } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../App';
 import { useNotification } from '../../helpers/Notificathions';
 import { coursesAPI } from '../../api/coursesAPI/service';
+import { userAPI } from '../../api/userAPI/service';
+import usdtIcon from "../../assets/images/usdt_icon.svg";
+import tonIcon from "../../assets/images/ton_icon.svg";
 import './RecommendedCourses.css';
 
 const RecommendedCourses = () => {
@@ -15,10 +19,19 @@ const RecommendedCourses = () => {
     const navigate = useNavigate();
     const { showNotification } = useNotification();
     const { user, courses: userCourses, fetchUser } = useContext(UserContext);
+    const [allCourses, setAllCourses] = useState(null);
 
     useEffect(() => {
-        const loadRecommendations = async () => {
+        const loadData = async () => {
             try {
+                // Get all courses first
+                const coursesResponse = await coursesAPI.getCourses();
+                if (coursesResponse.success === false) {
+                    throw new Error(coursesResponse.data.error);
+                }
+                setAllCourses(coursesResponse.data.courses);
+
+                // Get recommendations
                 const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
                 if (telegramId) {
                     const response = await getCourseRecommendations(telegramId);
@@ -27,31 +40,17 @@ const RecommendedCourses = () => {
                         .trim();
                     const titles = JSON.parse(recommendedTitles);
                     
-                    const COURSES = [
-                        {
-                            "id": "672c753f0c8b0afe26998847",
-                            "title": "Web Development: from Zero to Hero with test",
-                            "description": "Learn web development from scratch",
-                            "image": "https://img-c.udemycdn.com/course/480x270/437398_46c3_10.jpg",
-                            "author": "Igor Blink",
-                            "price": 0,
-                            "currency": "DL",
-                            "minimumSkill": "beginner",
-                            "category": "672c753f0c8b0afe26998847",
-                            "bonus": 500
-                        },
-                        // ... other courses
-                    ];
-
-                    // Filter out courses that user has already started
-                    const availableCourses = COURSES
+                    // Filter courses based on recommendations and user's courses
+                    const recommendedCourses = coursesResponse.data.courses
                         .filter(course => titles.includes(course.title))
-                        .filter(course => !userCourses?.some(userCourse => userCourse.id === course.id));
+                        .filter(course => !userCourses?.some(userCourse => 
+                            String(userCourse.id) === String(course.id)
+                        ));
 
-                    setRecommendations(availableCourses);
+                    setRecommendations(recommendedCourses);
                 }
             } catch (error) {
-                console.error('Error loading recommendations:', error);
+                console.error('Error loading data:', error);
                 setError('Failed to load recommendations');
                 showNotification('Error', 'Failed to load recommendations', 'error');
             } finally {
@@ -59,7 +58,7 @@ const RecommendedCourses = () => {
             }
         };
 
-        loadRecommendations();
+        loadData();
     }, [userCourses, showNotification]);
 
     const handleStartCourse = async (course) => {
@@ -70,6 +69,14 @@ const RecommendedCourses = () => {
                 showNotification('Error', response.data.error, 'error');
                 return;
             }
+
+            // Get updated course data
+            const courseDataResponse = await userAPI.getUserCourse(course.id);
+            if (courseDataResponse.success === false) {
+                showNotification('Error', courseDataResponse.data.error, 'error');
+                return;
+            }
+
             await fetchUser();
             showNotification('Success', "You have successfully started a course", 'success');
             navigate(`/course/${course.id}`);
@@ -78,6 +85,22 @@ const RecommendedCourses = () => {
             showNotification('Error', 'Failed to start course', 'error');
         } finally {
             setLoadingStart(false);
+        }
+    };
+
+    const sendPayment = async(course) => { 
+        setLoading(true);
+        try {
+            const response = await coursesAPI.startCourse(course.id);
+            if (response.success === false) {
+                return showNotification('Error', response.data.error, 'error');
+            }
+            console.log(response);
+        } catch (error) {
+            console.error('Error processing payment:', error);
+            showNotification('Error', 'Payment processing failed', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -131,15 +154,47 @@ const RecommendedCourses = () => {
                             </div>
                             
                             <div className="course-footer">
-                                <Button 
-                                    size="m" 
-                                    className="start-course-btn"
-                                    onClick={() => handleStartCourse(course)}
-                                    loading={loadingStart}
-                                    mode="gray"
-                                >
-                                    Start Learning
-                                </Button>
+                                {course.price === 0 ? (
+                                    <Button 
+                                        size="m" 
+                                        className="start-course-btn"
+                                        onClick={() => handleStartCourse(course)}
+                                        loading={loadingStart}
+                                        mode="gray"
+                                        id={'but-course-start'}
+                                    >
+                                        Start Learning
+                                    </Button>
+                                ) : (
+                                    <Modal 
+                                        header={<ModalHeader>Select payment method</ModalHeader>} 
+                                        trigger={
+                                            <Button 
+                                                size="m" 
+                                                id={'tg-but-by'} 
+                                                loading={loading}
+                                            >
+                                                Buy for {course.price}$
+                                            </Button>
+                                        } 
+                                        style={{paddingBottom: "16px"}} 
+                                    > 
+                                        <Cell 
+                                            before={<Avatar src={tonIcon} size={48} />} 
+                                            description="The Open Network"
+                                            onClick={() => sendPayment(course)} 
+                                        > 
+                                            TON 
+                                        </Cell> 
+                                        <Cell 
+                                            before={<Avatar src={usdtIcon} size={48} />} 
+                                            description="The Open Network" 
+                                            onClick={() => sendPayment(course)} 
+                                        > 
+                                            USDT 
+                                        </Cell> 
+                                    </Modal>
+                                )}
                             </div>
                         </div>
                     </Card>
