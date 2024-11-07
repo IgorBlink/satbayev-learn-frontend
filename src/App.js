@@ -20,7 +20,7 @@ import TestPage from './pages/TestPage/Test';
 import Hometask from './pages/Hometask/Hometask';
 import SkillsChoose from './pages/SkillsChoose/SkillsChoose'
 import { Backgroun } from './helpers/Background';
-import { getUserSkills, updateUserSkills } from '../../api/api';
+import { getUserSkills, updateUserSkills } from './api/api';
 export const UserContext = createContext({ 
   user: null 
 }) 
@@ -29,7 +29,7 @@ function App() {
   const { showNotification } = useNotification(); 
   const [isUserLoading, setIsUserLoading] = useState(true); // Loading state for user
   const [isSkillsLoading, setIsSkillsLoading] = useState(true); 
-  const [hasExistingSkills, setHasExistingSkills] = useState(false);// Loading state for skills
+  const [Skills] = getUserSkills();// Loading state for skills
   const [user, setUser] = useState(null) 
  
   const fetchUser = async () => { 
@@ -62,7 +62,7 @@ function App() {
   console.log(user?.user)
   if(user == null) return <Loader /> 
   if(user?.user?.newUser) return <OverviewBlocks />
-  if(!hasExistingSkills) return <Navigate to="/skillschoose" replace />;
+  if(!Skills) return <Navigate to="/skillschoose" replace />;
   return ( 
     <UserContext.Provider value={{ 
       user: user.user,
