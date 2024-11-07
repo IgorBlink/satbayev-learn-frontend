@@ -93,10 +93,10 @@ function App() {
   }, []) 
  
 
-  console.log(user?.user)
+  console.log(skills)
   if(user == null) return <Loader /> 
   if(user?.user?.newUser) return <OverviewBlocks />
-  if (!user?.user?.newUser && skills?.length === 0) {
+  if (!user?.user?.newUser && skills === null) {
     return <Navigate to="/skillschoose" replace />;
   }
   return ( 

@@ -2,6 +2,7 @@
     display: grid;
     gap: 20px 0;
     overflow-y: auto;
+    overflow: hidden;
 }
 
 .list-mycourses .item-mycourses {
