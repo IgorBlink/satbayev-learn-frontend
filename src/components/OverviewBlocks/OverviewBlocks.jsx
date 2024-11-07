@@ -42,7 +42,7 @@ const OverviewBlocks = () => {
             {step === 1 ? (
                 <Placeholder 
                     action={<Button onClick={() => setStep(2)}>Let’s go!</Button>}
-                    description="DecentraLearn is a learning platform right in Telegram! Let's tell you more about it"
+                    description="SatbayevLearn is a learning platform right in Telegram! Let's tell you more about it"
                     header={`Welcome!`}
                 >
                     <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
@@ -59,7 +59,7 @@ const OverviewBlocks = () => {
                 <Placeholder 
                     action={<Button onClick={() => setStep(4)}>Nice</Button>}
                     description="Get rewarded for every module and course you complete. Withdraw directly to your TON wallet."
-                    header="DecentraLearn points"
+                    header="SatbayevLearn points"
                 >
                     <tgs-player key={step} autoplay loop mode="normal" src={getTgsSrcForStep(step)} style={{width: 150, height: 150}}></tgs-player>
                 </Placeholder>
