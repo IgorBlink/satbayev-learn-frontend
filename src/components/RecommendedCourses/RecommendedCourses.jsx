@@ -14,60 +14,66 @@ const RecommendedCourses = () => {
     const { showNotification } = useNotification();
     const { user, courses: userCourses } = useContext(UserContext);
 
+    const COURSES = [
+        {
+            "id": "course1",
+            "title": "Web Development: from Zero to Hero with test",
+            "description": "Learn web development from scratch",
+            "image": "https://img-c.udemycdn.com/course/480x270/437398_46c3_10.jpg",
+            "author": "Igor Blink",
+            "price": 0,
+            "currency": "DL",
+            "minimumSkill": "beginner",
+            "category": "672c753f0c8b0afe26998847",
+            "bonus": 500
+        },
+        {
+            "id": "course2",
+            "title": "React: the complete guide with test",
+            "description": "Learn React from scratch",
+            "image": "https://img-b.udemycdn.com/course/240x135/1565838_e54e_18.jpg",
+            "author": "Igor Blink",
+            "price": 0,
+            "currency": "DL",
+            "minimumSkill": "beginner",
+            "category": "672c753f0c8b0afe26998847",
+            "bonus": 800
+        },
+        {
+            "id": "course3",
+            "title": "Getting started with SwiftUI with test",
+            "description": "Learn SwiftUI from scratch",
+            "image": "https://img-c.udemycdn.com/course/240x135/1778502_f4b9_12.jpg",
+            "author": "Igor Blink",
+            "price": 0,
+            "currency": "DL",
+            "minimumSkill": "beginner",
+            "category": "672c753f0c8b0afe26998848",
+            "bonus": 1500
+        }
+    ];
+
     useEffect(() => {
         const loadRecommendations = async () => {
             try {
                 const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
                 if (telegramId) {
                     const response = await getCourseRecommendations(telegramId);
+
                     const recommendedTitles = response.recommendations
                         .replace(/```json\n|\n```/g, '')
                         .trim();
                     const titles = JSON.parse(recommendedTitles);
-                    
-                    // Filter out courses that user has already started
-                    const COURSES = [
-                        {
-                            "title": "Web Development: from Zero to Hero with test",
-                            "description": "Learn web development from scratch",
-                            "image": "https://img-c.udemycdn.com/course/480x270/437398_46c3_10.jpg",
-                            "author": "Igor Blink",
-                            "price": 0,
-                            "currency": "DL",
-                            "minimumSkill": "beginner",
-                            "category": "672c753f0c8b0afe26998847",
-                            "bonus": 500
-                        },
-                        {
-                            "title": "React: the complete guide with test",
-                            "description": "Learn React from scratch",
-                            "image": "https://img-b.udemycdn.com/course/240x135/1565838_e54e_18.jpg",
-                            "author": "Igor Blink",
-                            "price": 0,
-                            "currency": "DL",
-                            "minimumSkill": "beginner",
-                            "category": "672c753f0c8b0afe26998847",
-                            "bonus": 800
-                        },
-                        {
-                            "title": "Getting started with SwiftUI with test",
-                            "description": "Learn SwiftUI from scratch",
-                            "image": "https://img-c.udemycdn.com/course/240x135/1778502_f4b9_12.jpg",
-                            "author": "Igor Blink",
-                            "price": 0,
-                            "currency": "DL",
-                            "minimumSkill": "beginner",
-                            "category": "672c753f0c8b0afe26998848",
-                            "bonus": 1500
-                        }
-                    ];
 
-                    const availableCourses = COURSES.filter(course => 
-                        titles.includes(course.title) && 
-                        !userCourses.some(userCourse => userCourse.id === course.id)
-                    );
+                    let recommendedCourses = COURSES.filter(course => titles.includes(course.title));
 
-                    setRecommendations(availableCourses);
+                    if (userCourses && userCourses.length > 0) {
+                        recommendedCourses = recommendedCourses.filter(course =>
+                            !userCourses.some(userCourse => userCourse.id === course.id)
+                        );
+                    }
+
+                    setRecommendations(recommendedCourses);
                 }
             } catch (error) {
                 console.error('Error loading recommendations:', error);
@@ -113,8 +119,8 @@ const RecommendedCourses = () => {
                 <p className="recommended-subtitle">Based on your skills</p>
                 
                 <div className="recommended-courses">
-                    {recommendations.map((course, index) => (
-                        <Card key={index} className="recommended-course-card">
+                    {recommendations.map((course) => (
+                        <Card key={course.id} className="recommended-course-card">
                             <div className="course-image-wrapper">
                                 <img 
                                     src={course.image} 
