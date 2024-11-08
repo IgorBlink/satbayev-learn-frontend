@@ -19,53 +19,71 @@ const RecommendedCourses = () => {
     useEffect(() => {
         const loadRecommendations = async () => {
             try {
-                // Get courses from backend
-                const coursesResponse = await coursesAPI.getCourses();
-                if (!coursesResponse || coursesResponse.success === false) {
-                    throw new Error(coursesResponse?.data?.error || 'Failed to fetch courses');
-                }
-                const backendCourses = coursesResponse.data.courses;
-
-                // Get recommendations
                 const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-                if (!telegramId) {
-                    throw new Error('No Telegram ID found');
-                }
+                if (telegramId) {
+                    const response = await getCourseRecommendations(telegramId);
+                    const recommendedTitles = response.recommendations
+                        .replace(/```json\n|\n```/g, '')
+                        .trim();
+                    const titles = JSON.parse(recommendedTitles);
+                    
+                    const COURSES = [
+                        {
+                            "id": "6713c3cdfc574a75ca2e3134",
+                            "title": "Web Development: from Zero to Hero with test",
+                            "description": "Learn web development from scratch",
+                            "image": "https://img-c.udemycdn.com/course/480x270/437398_46c3_10.jpg",
+                            "author": "Igor Blink",
+                            "price": 0,
+                            "currency": "DL",
+                            "minimumSkill": "beginner",
+                            "category": "6713c388c76c21301aec4209",
+                            "bonus": 500
+                        },
+                        {
+                            "id": "672c753f0c8b0afe26998847",
+                            "title": "React: the complete guide with test",
+                            "description": "Learn React from scratch",
+                            "image": "https://img-b.udemycdn.com/course/240x135/1565838_e54e_18.jpg",   
+                            "author": "Igor Blink",
+                            "price": 0,
+                            "currency": "DL",
+                            "minimumSkill": "beginner",
+                            "category": "672c753f0c8b0afe26998847",
+                            "bonus": 800
+                        },
+                        {
+                            "id": "6713c3c0fc574a75ca2e3136",
+                            "title": "Getting started with SwiftUI with test",
+                            "description": "Learn SwiftUI from scratch",
+                            "image": "https://img-c.udemycdn.com/course/240x135/1778502_f4b9_12.jpg",
+                            "author": "Igor Blink",
+                            "price": 0,
+                            "currency": "DL",
+                            "minimumSkill": "beginner",
+                            "category": "6713c388c76c21301aec420a",
+                            "bonus": 1500
+                        }
+                    ];
 
-                const response = await getCourseRecommendations(telegramId);
-                if (!response || !response.recommendations) {
-                    throw new Error('No recommendations found');
-                }
+                    // Filter out courses user has already started
+                    const availableCourses = COURSES
+                        .filter(course => titles.includes(course.title))
+                        .filter(course => !userCourses?.some(userCourse => 
+                            String(userCourse.id) === String(course.id)
+                        ));
 
-                const recommendedTitles = response.recommendations
-                    .replace(/```json\n|\n```/g, '')
-                    .trim();
-                const titles = JSON.parse(recommendedTitles);
-                
-                // Filter courses: recommended AND not started by user
-                const availableCourses = backendCourses.filter(course => {
-                    const isRecommended = titles.includes(course.title);
-                    const isNotStarted = !userCourses?.some(userCourse => 
-                        String(userCourse.id) === String(course.id)
-                    );
-                    return isRecommended && isNotStarted;
-                });
-
-                if (availableCourses.length > 0) {
                     setRecommendations(availableCourses);
                 }
             } catch (error) {
                 console.error('Error loading recommendations:', error);
                 setError('Failed to load recommendations');
-                showNotification('Error', 'Failed to load recommendations', 'error');
             } finally {
                 setLoading(false);
             }
         };
 
-        if (userCourses) {
-            loadRecommendations();
-        }
+        loadRecommendations();
     }, [userCourses]);
 
     const handleStartCourse = async (course) => {
@@ -78,7 +96,7 @@ const RecommendedCourses = () => {
             }
             await fetchUser();
             showNotification('Success', "You have successfully started a course", 'success');
-            navigate(`/course/${course.id}`);
+            navigate(`/courses/${course.category}`);
         } catch (error) {
             console.error('Error starting course:', error);
             showNotification('Error', 'Failed to start course', 'error');
