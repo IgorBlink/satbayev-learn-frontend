@@ -95,8 +95,8 @@ const RecommendedCourses = () => {
                 return;
             }
             await fetchUser();
-            showNotification('Success', "You have successfully started a course", 'success');
-            navigate(`/courses/${course.category}`);
+            showNotification('Success', "Course started successfully! ", 'success');
+            navigate('/courses');
         } catch (error) {
             console.error('Error starting course:', error);
             showNotification('Error', 'Failed to start course', 'error');
@@ -135,7 +135,7 @@ const RecommendedCourses = () => {
                                 loading="lazy"
                             />
                             <div className="course-overlay">
-                                <span className="course-bonus">+{course.bonus} DL</span>
+                                <span className="course-bonus">+{course.bonus} Points</span>
                             </div>
                             <div className="course-price">
                                 <span>{course.price === 0 ? 'Free' : `${course.price} ${course.currency}`}</span>
