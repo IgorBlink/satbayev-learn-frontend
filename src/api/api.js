@@ -4,7 +4,7 @@ const token = 'cXVlcnlfaWQ9QUFGRUR6Uk5BQUFBQUVRUE5FMG50bzRIJnVzZXI9JTdCJTIyaWQlM
 
 // Base fetch function for main API
 export const fetchData = async (url, method, body = {}) => {
-    if(method === "GET") {f
+    if(method === "GET") {
         const response = await fetch(BASE_URL+url, {
             headers: {
                 "ngrok-skip-browser-warning": "1",

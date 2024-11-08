@@ -46,7 +46,7 @@ const RecommendedCourses = () => {
                             "description": "Learn React from scratch",
                             "image": "https://img-b.udemycdn.com/course/240x135/1565838_e54e_18.jpg",   
                             "author": "Igor Blink",
-                            "price": 0,Please check 'My Courses' page to continue learning
+                            "price": 0,
                             "currency": "DL",
                             "minimumSkill": "beginner",
                             "category": "672c753f0c8b0afe26998847",
