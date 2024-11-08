@@ -21,27 +21,37 @@ const RecommendedCourses = () => {
             try {
                 // Get courses from backend
                 const coursesResponse = await coursesAPI.getCourses();
-                if (coursesResponse.success === false) {
-                    throw new Error(coursesResponse.data.error);
+                if (!coursesResponse || coursesResponse.success === false) {
+                    throw new Error(coursesResponse?.data?.error || 'Failed to fetch courses');
                 }
                 const backendCourses = coursesResponse.data.courses;
 
                 // Get recommendations
                 const telegramId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-                if (telegramId) {
-                    const response = await getCourseRecommendations(telegramId);
-                    const recommendedTitles = response.recommendations
-                        .replace(/```json\n|\n```/g, '')
-                        .trim();
-                    const titles = JSON.parse(recommendedTitles);
-                    
-                    // Filter courses: recommended AND not started by user
-                    const availableCourses = backendCourses
-                        .filter(course => titles.includes(course.title))
-                        .filter(course => !userCourses?.some(userCourse => 
-                            String(userCourse.id) === String(course.id)
-                        ));
+                if (!telegramId) {
+                    throw new Error('No Telegram ID found');
+                }
 
+                const response = await getCourseRecommendations(telegramId);
+                if (!response || !response.recommendations) {
+                    throw new Error('No recommendations found');
+                }
+
+                const recommendedTitles = response.recommendations
+                    .replace(/```json\n|\n```/g, '')
+                    .trim();
+                const titles = JSON.parse(recommendedTitles);
+                
+                // Filter courses: recommended AND not started by user
+                const availableCourses = backendCourses.filter(course => {
+                    const isRecommended = titles.includes(course.title);
+                    const isNotStarted = !userCourses?.some(userCourse => 
+                        String(userCourse.id) === String(course.id)
+                    );
+                    return isRecommended && isNotStarted;
+                });
+
+                if (availableCourses.length > 0) {
                     setRecommendations(availableCourses);
                 }
             } catch (error) {
@@ -53,8 +63,10 @@ const RecommendedCourses = () => {
             }
         };
 
-        loadRecommendations();
-    }, [userCourses, showNotification]);
+        if (userCourses) {
+            loadRecommendations();
+        }
+    }, [userCourses]);
 
     const handleStartCourse = async (course) => {
         setLoadingStart(true);
@@ -66,7 +78,7 @@ const RecommendedCourses = () => {
             }
             await fetchUser();
             showNotification('Success', "You have successfully started a course", 'success');
-            navigate(`/courses/${course.category}`);
+            navigate(`/course/${course.id}`);
         } catch (error) {
             console.error('Error starting course:', error);
             showNotification('Error', 'Failed to start course', 'error');
