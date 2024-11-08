@@ -1,5 +1,5 @@
 export const BASE_URL = "https://dl-back.km-dev.tech"
-export const SKILLS_URL = "https://4305-2a03-32c0-7000-a4f6-4384-6f9a-8568-503a.ngrok-free.app"
+export const SKILLS_URL = "https://cd23-2-133-130-122.ngrok-free.app"
 const token = window.btoa(window.Telegram.WebApp.initData)
 
 // Base fetch function for main API
